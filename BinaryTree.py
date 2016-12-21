@@ -1,4 +1,5 @@
 class Node(object):
+
     def __init__(self, data=None, *args, **kwargs):
         self._data = data
         self._left = None
@@ -43,6 +44,9 @@ class BinaryTree(object):
     def setRoot(self, node):
         self._root = node
 
+    def getRoot(self):
+        return self._root
+
     def bfsTraversal(self):
         from collections import deque
         d = deque()
@@ -54,6 +58,27 @@ class BinaryTree(object):
                 d.append(n.getLeft())
             if n.getRight():
                 d.append(n.getRight())
+
+    @staticmethod
+    def inorder(node):
+        if node:
+            BinaryTree.inorder(node.getLeft())
+            print node.getData(),
+            BinaryTree.inorder(node.getRight())
+
+    @staticmethod
+    def preorder(node):
+        if node:
+            print node.getData(),
+            BinaryTree.preorder(node.getLeft())
+            BinaryTree.preorder(node.getRight())
+
+    @staticmethod
+    def postorder(node):
+        if node:
+            BinaryTree.postorder(node.getLeft())
+            BinaryTree.postorder(node.getRight())
+            print node.getData(),
 
     def dfsTraversal(self):
         stack = []
@@ -89,36 +114,44 @@ class BinaryTree(object):
 
     @classmethod
     def createTree(cls, node_num=0):
-        from random import randint
+        from collections import deque
+        queue = deque()
         bt = BinaryTree()
-        nodes = []
-        stack = []
+        nodes = deque()
 
         for i in range(node_num):
-            # d = randint(0, node_num)
             nodes.append(Node(i))
 
-        while len(nodes):
+        while nodes:
             if bt.isEmpty():
-                n = nodes.pop()
+                n = nodes.popleft()
                 bt.setRoot(n)
-                stack.append(n)
+                queue.append(n)
             else:
-                n = stack.pop()
-                if len(nodes):
-                    r = nodes.pop()
-                    n.setRight(r)
-                    stack.append(r)
-                if len(nodes):
-                    l = nodes.pop()
+                n = queue.popleft()
+                if nodes:
+                    l = nodes.popleft()
                     n.setLeft(l)
-                    stack.append(l)
+                    queue.append(l)
+
+                if nodes:
+                    r = nodes.popleft()
+                    n.setRight(r)
+                    queue.append(r)
 
         bt.printTree()
         return bt
 
 
 if __name__ == '__main__':
+    print "Tree"
     l = BinaryTree.createTree(10)
-    print l.count()
+    print "\ninorder"
+    BinaryTree.inorder(l.getRoot())
+    print "\npreorder"
+    BinaryTree.preorder(l.getRoot())
+    print "\npostorder"
+    BinaryTree.postorder(l.getRoot())
+
+    print "\nTotal nodes", l.count()
     assert l.count() == 10
